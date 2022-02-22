@@ -7,7 +7,11 @@ import (
 )
 
 func main() {
-	r := gin.Default()
-	routes.SetupRouter(r)
-	r.Run() // listen and serve on 0.0.0.0:8080
+	router := gin.Default()
+	// routes.SetupRouter(r)
+
+	routes.AuthRoutes(router)
+	routes.UserRoutes(router)
+
+	router.Run() // listen and serve on 0.0.0.0:8080
 }
