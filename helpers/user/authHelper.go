@@ -20,9 +20,13 @@ type SignedDetails struct {
 var SECRET_KEY = os.Getenv("SECRET_KEY")
 
 func VerifyToken(clientToken string) (claims *SignedDetails, responseErr error) {
-	token, err := jwt.ParseWithClaims(clientToken, &SignedDetails{}, func(t *jwt.Token) (interface{}, error) {
-		return []byte(SECRET_KEY), nil
-	})
+	token, err := jwt.ParseWithClaims(
+		clientToken,
+		&SignedDetails{},
+		func(t *jwt.Token) (interface{}, error) {
+			return []byte(SECRET_KEY), nil
+		},
+	)
 
 	if err != nil {
 		responseErr = err
@@ -53,7 +57,8 @@ func CreateToken(email, first_name, last_name, user_id string) (string, error) {
 		},
 	}
 
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(SECRET_KEY))
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).
+		SignedString([]byte(SECRET_KEY))
 
 	if err != nil {
 		log.Panic(err)
