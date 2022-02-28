@@ -10,6 +10,6 @@ func AuthRoutes(gin *gin.Engine) {
 	u := gin.Group("/user")
 	{
 		u.POST("/signup", controller.Signup())
-		u.POST("/login", controller.Login)
+		u.POST("/login", controller.Login())
 	}
 }

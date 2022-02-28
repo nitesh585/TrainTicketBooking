@@ -8,7 +8,7 @@ import (
 )
 
 func UserRoutes(gin *gin.Engine) {
-	gin.Use(middleware.Authenticate)
+	gin.Use(middleware.AuthenticateToken())
 
 	u := gin.Group("/user")
 	{

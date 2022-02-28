@@ -15,7 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var userCollection *mongo.Collection = database.OpenCollection(database.MongoClient, "user")
@@ -31,7 +31,7 @@ func VerifyPassword() {
 
 func Signup() gin.HandlerFunc {
 	return func(g *gin.Context) {
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 		defer cancel()
 		var user models.User
 
@@ -61,16 +61,24 @@ func Signup() gin.HandlerFunc {
 			return
 		}
 
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			log.Panic("Password not hashed!")
+			g.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+			return
+		}
+		user.Password = string(hashedPassword)
+
 		user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.Id = primitive.NewObjectID()
 		user.User_id = user.Id.Hex()
-		uuid, err := uuid.New()
 		defer cancel()
 		if err != nil {
 			g.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
 			return
 		}
-		user.Token, err = helper.CreateToken(user.Email, user.FirstName, user.LastName, uuid)
+
+		user.Token, err = helper.CreateToken(user.Email, user.FirstName, user.LastName, user.User_id)
 		defer cancel()
 		if err != nil {
 			g.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
@@ -88,8 +96,34 @@ func Signup() gin.HandlerFunc {
 	}
 }
 
-func Login(gin *gin.Context) {
+func Login() gin.HandlerFunc {
+	return func(g *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+		var user models.User
 
+		if err := g.BindJSON(&user); err != nil {
+			g.JSON(http.StatusBadRequest, gin.H{"error": "User JSON bind error", "details": err.Error()})
+			return
+		}
+
+		var userRecord models.User
+		err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&userRecord)
+		defer cancel()
+		if err != nil {
+			g.JSON(http.StatusBadRequest, gin.H{"error": "User not found", "details": err.Error()})
+			return
+		}
+
+		err = bcrypt.CompareHashAndPassword([]byte(userRecord.Password), []byte(user.Password))
+		defer cancel()
+		if err != nil {
+			g.JSON(http.StatusBadGateway, gin.H{"error": "wrong password", "details": err.Error()})
+			return
+		}
+
+		g.JSON(http.StatusOK, gin.H{"user": userRecord})
+	}
 }
 
 func GetUsers(gin *gin.Context) {
