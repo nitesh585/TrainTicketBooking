@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"rail/database"
+	helper "rail/helpers/user"
 	models "rail/models/user"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
 )
 
 var userCollection *mongo.Collection = database.OpenCollection(database.MongoClient, "user")
@@ -62,7 +64,18 @@ func Signup() gin.HandlerFunc {
 		user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.Id = primitive.NewObjectID()
 		user.User_id = user.Id.Hex()
-		user.Token = "hello"
+		uuid, err := uuid.New()
+		defer cancel()
+		if err != nil {
+			g.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+			return
+		}
+		user.Token, err = helper.CreateToken(user.Email, user.FirstName, user.LastName, uuid)
+		defer cancel()
+		if err != nil {
+			g.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+			return
+		}
 
 		insertedNumber, insertErr := userCollection.InsertOne(ctx, user)
 		defer cancel()
@@ -71,7 +84,7 @@ func Signup() gin.HandlerFunc {
 			return
 		}
 
-		g.JSON(http.StatusOK, gin.H{"insertedNumber": insertedNumber})
+		g.JSON(http.StatusOK, gin.H{"insertedNumber": insertedNumber, "Token": user.Token})
 	}
 }
 

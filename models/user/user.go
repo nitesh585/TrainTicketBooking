@@ -15,12 +15,12 @@ type Address struct {
 
 type User struct {
 	Id         primitive.ObjectID `bson:"_id"`
-	FirstName  string             `json:"first_name" validate:"required, min=2, max=100"`
-	LastName   string             `json:"last_name" validate:"required, min=2, max=100"`
-	Password   string             `json:"password" validate:"required, min=6"`
-	Email      string             `json:"email" validate:"email, required"`
+	FirstName  string             `json:"firstname" validate:"min=2,max=100,required"`
+	LastName   string             `json:"lastname" validate:"min=2,max=100,required"`
+	Password   string             `json:"password" validate:"min=6,required"`
+	Email      string             `json:"email" validate:"email,required"`
 	Phone      string             `json:"phone" validate:"required"`
 	Token      string             `json:"token"`
 	Created_at time.Time          `json:"created_at"`
-	User_id    string             `json:"user_id" `
+	User_id    string             `json:"user_id"`
 }
