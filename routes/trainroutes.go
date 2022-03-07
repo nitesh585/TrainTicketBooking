@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func trainRoute(gin *gin.Engine) {
-	t := gin.Group("train")
+func TrainRoute(gin *gin.Engine) {
+	t := gin.Group("/train")
 	{
 		t.GET("/searchRoute", controller.SearchRoute())
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"rail/database"
+	helper "rail/helpers/train"
 	models "rail/models/train"
 	"time"
 
@@ -22,7 +23,7 @@ var userCollection *mongo.Collection = database.OpenCollection(database.MongoCli
 
 func SearchRoute() gin.HandlerFunc {
 	return func(g *gin.Context) {
-		ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+		ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 		defer cancel()
 
 		var search SearchQuery
@@ -32,13 +33,37 @@ func SearchRoute() gin.HandlerFunc {
 			return
 		}
 
-		var trainDetails models.Train
+		cursor, err := userCollection.Find(ctx, bson.D{{"Stations", bson.D{{"$all", bson.A{search.Source, search.Destination}}}}})
+		// Decode(&trainDetails)
 
-		err := userCollection.FindOne(ctx, bson.D{{"tags", bson.D{{"$all", bson.A{"red", "blank"}}}}}).Decode(&trainDetails)
 		if err != nil {
-			g.JSON(http.StatusOK, gin.H{"error": err.Error()})
+			g.JSON(http.StatusOK, gin.H{"error": "no routes"})
 			return
 		}
 
+		var trainDetails []models.Train
+
+		if err := cursor.All(ctx, &trainDetails); err != nil {
+			g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		//-------------check for date availability
+		layout := "01/02/06"
+		parseDate, err := time.Parse(layout, search.Date)
+		if err != nil {
+			g.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		if time.Now().After(parseDate) {
+			g.JSON(http.StatusBadRequest, gin.H{"error": "invalid date"})
+			return
+		}
+
+		weekday := parseDate.Weekday().String()
+		responseTrainDetails := helper.FilterDetailsOnWeekdayAwailability(weekday, trainDetails)
+
+		g.JSON(http.StatusOK, gin.H{"trainDetails": responseTrainDetails})
 	}
 }
