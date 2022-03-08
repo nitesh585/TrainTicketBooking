@@ -6,7 +6,7 @@ import (
 
 var weekDayToKey = make(map[string]string)
 
-func isTrainAvailableOnGivenWeekDay(weekday string, trainRecord models.Train) bool {
+func IsTrainAvailableOnGivenWeekDay(weekday string, trainRecord models.Train) bool {
 	switch weekday {
 	case "Tuesday":
 		return trainRecord.RunningTue == "Y"
@@ -26,10 +26,13 @@ func isTrainAvailableOnGivenWeekDay(weekday string, trainRecord models.Train) bo
 	}
 }
 
-func FilterDetailsOnWeekdayAwailability(weekday string, trainDetails []models.Train) []models.Train {
+func FilterDetailsOnWeekdayAwailability(
+	weekday string,
+	trainDetails []models.Train,
+) []models.Train {
 	var filteredTrainDetails []models.Train
 	for _, rec := range trainDetails {
-		if isTrainAvailableOnGivenWeekDay(weekday, rec) {
+		if IsTrainAvailableOnGivenWeekDay(weekday, rec) {
 			filteredTrainDetails = append(filteredTrainDetails, rec)
 		}
 	}
