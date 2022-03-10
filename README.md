@@ -47,9 +47,19 @@ payment method
 - pay for the tickets
 - cancel pay anytime before
 
+## Concepts/Topic covered:
+- gin-gonic/gin framework
+- JWT integration
+- Introducing middlewares
+- Added Unit test (table-driven)
+- MondoDb integration
+
 ## Supported APIs:
 - /user/signup
 - /user/login
+- /train/searchRoute
 
 ## Working
-- /train/searchRoute
+- integrated payment feature 
+- integration of docker build
+- logout 
