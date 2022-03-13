@@ -64,6 +64,8 @@ func SearchRoute() gin.HandlerFunc {
 		weekday := parseDate.Weekday().String()
 		responseTrainDetails := helper.FilterDetailsOnWeekdayAwailability(weekday, trainDetails)
 
+		responseTrainDetails = helper.CalculatePrice(search.Source, search.Destination, trainDetails)
+
 		g.JSON(http.StatusOK, gin.H{"trainDetails": responseTrainDetails})
 	}
 }

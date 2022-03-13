@@ -23,4 +23,5 @@ type Train struct {
 	RunningSun      string             `json:"runningSun"`
 	AvlClasses      []string           `json:"avlClasses"`
 	Stations        []string           `json:"stations"`
+	Price           []int
 }
