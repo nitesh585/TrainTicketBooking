@@ -122,16 +122,8 @@ func TestFindElementIndex(t *testing.T) {
 		array    []string
 		expected int
 	}{
-		{
-			"hello",
-			arr,
-			1,
-		},
-		{
-			"me",
-			arr,
-			-1,
-		},
+		{"hello", arr, 1},
+		{"me", arr, -1},
 	}
 
 	for _, tc := range cases {
@@ -152,9 +144,7 @@ func TestGetPriceByClasses(t *testing.T) {
 		avlClasses []string
 		expected   []int
 	}{
-		{
-			0, 2, avlClasses, expectedAns1,
-		},
+		{0, 2, avlClasses, expectedAns1},
 	}
 
 	for _, tc := range cases {
