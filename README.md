@@ -1,65 +1,63 @@
-# Train-ticket booking systems
+# Train Reservation System
 
-## Functional Requirements:
+### High-level design of Train Reservation System
 
-### user management
-- user can register, login and logout
-- maintain history
-    - booked , canceled, failed tickets
-    - ticket refunds
-- update profile
-    - password and basic personal details
-    - add aadhaar card with KYC
+![trainTicketArchitecture](https://user-images.githubusercontent.com/23628103/161523420-f93bdbc8-e8e7-45fc-ab91-73236da34fc9.png)
 
+### Tech Stack
 
-### search engine
-- check for the train availability on the basis of source, destination stations and date
-- if direct route not found then show different available connected path from source to   
-  destination
-- add filters of classes, seat priority, etc.
-- user should get list of available trains with further details:
-- seats available, RAC & waiting list count
-- arrival time and departure time
-- estimated journey time
-- train schedule
-- pricing
-- user can update the search query
+| #                                                                                                                                       | Name                     |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| <img src="https://th.bing.com/th/id/OIP.mbEpyJoKrhRxgM8hOEyCnwHaDl?pid=ImgDet&rs=1" width="30px" />                                     | Go                       |
+| <img src="https://raw.githubusercontent.com/gin-gonic/logo/master/color.png" width="22px" height="25px" />                              | Gin-gonic                |
+| <img src="https://jwt.io/img/pic_logo.svg" width="28px" />                                                                              | JWT                      |
+| <img src="https://th.bing.com/th/id/OIP.opCGA6vB3-uK-wovJxHocQHaMB?pid=ImgDet&rs=1" width="25px" height="30px" />                       | Kafka                    |
+| <img src="https://yt3.ggpht.com/-4DiTG0vtEW0/AAAAAAAAAAI/AAAAAAAAAAA/73kg_CNK54g/s900-c-k-no-mo-rj-c0xffffff/photo.jpg" width="40px" /> | Docker                   |
+| <img src="https://th.bing.com/th/id/OIP.2DKX6fd0wlVbbjff_noWHgAAAA?pid=ImgDet&rs=1" width="30px" />                                     | Swagger                  |
+| <img src="https://th.bing.com/th/id/OIP.4y0O4Ytk5MArYDVEKMahLQHaHa?pid=ImgDet&rs=1" width="30px" />                                     | MongoDB (Mongo-Atlas)          |
+| <img src="https://th.bing.com/th/id/OIP.KWTSipv0th6chxVeD_oWhwHaCD?pid=ImgDet&rs=1" width="55px" />                                     | Sonarqube                |
+| <img src="https://hostbillapp.com/appstore/payment_razorpay/images/logo.png" width="55px" />                                            | RazorPay Payment Gateway |
 
+### User Service
 
-### booking engine
-- book ticket for selected train
-- user must logged in before booking
-- get the details of passengers (age, name and seat priority) and give a review page to user
-- after reviewing, redirect to the payment method.
-- cancel ticket after booking
-    - if cancellation is after chart preparation or as per law, then refund after deduction otherwise not
-    - user can cancel whole ticket or cancel ticket for one of the passenger
-- give invoice or ticket in the end of successful booking on email or sms as per the subscribed service
+Service that directly interacts with client and used for creating, updating, deleting users.
+PORT - 8081
+APIs: `/login`, `/signup`, `/getUserDetails`, `/user`
+(delete method)
 
+Producing greeting messages at the time of successful registration to `kafka` which is consumed by `email service`.
 
-### notification module
-- user should get alerts about tickets on subscribed services eg. email or sms
-- should give alert to user about his/her ticket status
-    - alert if the ticket got confirmed from RAC or WL
-payment method
-- integrate one of payment gateways
-- user must logged in and selected at least one seat
-- pay for the tickets
-- cancel pay anytime before
+### Train Service
 
-## Concepts/Topic covered:
-- gin-gonic/gin framework
-- JWT integration
-- Introducing middlewares
-- Added Unit test (table-driven)
-- MondoDb integration
+This service also directly interact with client. Client can search for train routes from source to destination station code on specific time and do booking.
+PORT - 8082
+APIs: `/book`, `/search`
 
-## Supported APIs:
-- /user/signup
-- /user/login
-- /train/searchRoute
+### Payment Service
 
-## Working
-- integrated payment feature 
-- integration of docker build
-- logout 
+This service also directly interact with client. Client can pay for their tickets that links with
+PORT - 8083
+APIs: `/book`, `/search`
+
+### Email Service
+
+service continously consuming kafka messages of topic-"email" and sends email to given receiver email and content.
+
+### Invoice Service
+
+service used to generated invoice of paid tickets for user which sends details to email service.
+
+### Logging Service
+
+service used to store all the logs generated by other services in mongoDB according to log level in different collection of `log` database.
+
+### Database Service
+
+service that stores data in MongoDB after consuming the details from kafka.
+
+### Kafka Brokers
+
+- `topic` : email | `host` : localhost:9091
+- `topic` : invoice | `host` : localhost:9092
+- `topic` : error, info, debug, warn | `host` : localhost:9093
+- `topic` : pay | `host` : localhost:9094

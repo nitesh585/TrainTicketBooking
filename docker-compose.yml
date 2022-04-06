@@ -1,0 +1,22 @@
+version: '1'
+services:
+    userService:
+        build: ./userService/
+        ports:
+          - "8081:8081"
+    paymentService:
+        build: ./paymentService/
+        ports:
+        - "8083:8083"
+    trainService:
+        build: ./trainService/
+        ports:
+        - "8082:8082"
+    emailService:
+        build: ./emailService/
+    invoiceService:
+        build: ./invoiceService/
+        ports:
+        - "8084:8084"
+    loggingService:
+        build: ./loggingService/

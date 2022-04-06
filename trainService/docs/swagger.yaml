@@ -1,0 +1,176 @@
+definitions:
+  models.Train:
+    properties:
+      _id:
+        type: string
+      avlClasses:
+        items:
+          type: string
+        type: array
+      avlTime:
+        type: string
+      depTime:
+        type: string
+      destination:
+        type: string
+      distance:
+        type: string
+      duration:
+        type: string
+      price:
+        items:
+          type: integer
+        type: array
+      runningFri:
+        type: string
+      runningMon:
+        type: string
+      runningSat:
+        type: string
+      runningSun:
+        type: string
+      runningThr:
+        type: string
+      runningTue:
+        type: string
+      runningWed:
+        type: string
+      source:
+        type: string
+      stations:
+        items:
+          type: string
+        type: array
+      trainNumber:
+        type: string
+      trainname:
+        type: string
+    type: object
+host: localhost:8082
+info:
+  contact:
+    email: swiggyb2013@datascience.manipal.edu
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Swagger Train-Ticket Booking System API.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Train-Ticket Booking System API
+  version: "1.0"
+paths:
+  /train/checkAvailability:
+    post:
+      consumes:
+      - application/json
+      description: check whether train is available on particular date or not
+      parameters:
+      - description: unique train id
+        in: body
+        name: TrainID
+        required: true
+        schema:
+          type: string
+      - description: date of booking
+        in: body
+        name: Date
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Train'
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Check Availability
+      tags:
+      - Train
+  /train/searchRoute:
+    post:
+      consumes:
+      - application/json
+      description: search route from source to destination stations on specific date
+      parameters:
+      - description: source station code
+        in: body
+        name: Source
+        required: true
+        schema:
+          type: string
+      - description: destination station code
+        in: body
+        name: Destination
+        required: true
+        schema:
+          type: string
+      - description: date of booking
+        in: body
+        name: Date
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Train'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Search route from source to destination stations
+      tags:
+      - Train
+  /train/trainDetails:
+    post:
+      consumes:
+      - application/json
+      description: Get details of sepecific train with its number
+      parameters:
+      - description: unique train number
+        in: body
+        name: TrainNumber
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Train'
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Get details of sepecific train with its number
+      tags:
+      - Train
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

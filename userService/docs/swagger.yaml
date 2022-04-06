@@ -1,0 +1,177 @@
+definitions:
+  models.SignUpResponse:
+    properties:
+      insertedNumber:
+        type: integer
+      token:
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      firstname:
+        maxLength: 100
+        minLength: 2
+        type: string
+      id:
+        type: string
+      lastname:
+        maxLength: 100
+        minLength: 2
+        type: string
+      password:
+        minLength: 6
+        type: string
+      phone:
+        type: string
+      token:
+        type: string
+      user_id:
+        type: string
+    required:
+    - email
+    - firstname
+    - lastname
+    - password
+    - phone
+    type: object
+host: localhost:8081
+info:
+  contact:
+    email: swiggyb2013@datascience.manipal.edu
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Swagger Train-Ticket Booking System API.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Train-Ticket Booking System API
+  version: "1.0"
+paths:
+  /user/getUserDetails:
+    post:
+      consumes:
+      - application/json
+      description: get user details using ID
+      parameters:
+      - description: unique user id
+        in: body
+        name: User_ID
+        required: true
+        schema:
+          type: string
+      - description: user token
+        in: header
+        name: Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Get user details on ID
+      tags:
+      - User
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: user log in API
+      parameters:
+      - description: password
+        in: body
+        name: Password
+        required: true
+        schema:
+          type: string
+      - description: email id
+        in: body
+        name: Email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Login the user
+      tags:
+      - User
+  /user/signup:
+    post:
+      consumes:
+      - application/json
+      description: user registration API
+      parameters:
+      - description: first name of user
+        in: body
+        name: FirstName
+        required: true
+        schema:
+          type: string
+      - description: last name of user
+        in: body
+        name: LastName
+        required: true
+        schema:
+          type: string
+      - description: password
+        in: body
+        name: Password
+        required: true
+        schema:
+          type: string
+      - description: email id
+        in: body
+        name: Email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SignUpResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+          schema:
+            type: number
+      summary: Sign up the user
+      tags:
+      - User
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
